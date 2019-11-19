@@ -1,0 +1,593 @@
+Imports System.IO
+Imports System.Drawing.Imaging
+
+Public Class Form1
+
+    Dim Drag As Boolean
+    Dim MouseX As Integer
+    Dim MouseY As Integer
+    Dim GBCount As Integer = 0
+    Dim Max As Integer = 0
+    Dim Fitwidth(5) As Integer
+    Dim Fitheight(5) As Integer
+    Dim Wwidth As Integer
+    Dim Hheight As Integer
+    Dim Proc() As TProcess
+    Dim N, C, P As Integer
+    Dim bOund As Color
+    Dim down As Boolean = False
+    Dim mLine As Boolean = False
+    Dim mFill As Boolean = False
+    Dim mCircle As Boolean = True
+    Dim pictTimer As PictureBox
+    Dim pictX As Integer
+    Dim pictY As Integer
+    Dim fillType As Integer
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        End
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Me.WindowState = FormWindowState.Minimized
+    End Sub
+    Private Sub Panel1_MouseDown(sender As Object, e As MouseEventArgs) Handles Panel1.MouseDown
+        Drag = True
+        MouseX = Windows.Forms.Cursor.Position.X - Me.Left
+        MouseY = Windows.Forms.Cursor.Position.Y - Me.Top
+    End Sub
+
+    Private Sub Panel1_MouseMove(sender As Object, e As MouseEventArgs) Handles Panel1.MouseMove
+        If Drag Then
+            Me.Top = Windows.Forms.Cursor.Position.Y - MouseY
+            Me.Left = Windows.Forms.Cursor.Position.X - MouseX
+        End If
+    End Sub
+
+    Private Sub Panel1_MouseUp(sender As Object, e As MouseEventArgs) Handles Panel1.MouseUp
+        Drag = False
+    End Sub
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        If GBCount = 0 Then
+            GroupBox1.Show()
+            fillType = 1
+        ElseIf GBCount = 1 Then
+            GroupBox1.Hide()
+        End If
+        GBCount = GBCount + 1
+        If GBCount = 2 Then GBCount = 0
+    End Sub
+
+    Private Sub Panel1_Paint(sender As Object, e As PaintEventArgs) Handles Panel1.Paint
+
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        GroupBox1.Hide()
+        GroupBox2.Hide()
+        GroupBox3.Hide()
+        GroupBox4.Hide()
+        Fitwidth(0) = Me.Width - Button7.Location.X
+        Fitwidth(1) = Me.Width - Button8.Location.X
+        Fitwidth(2) = Me.Width - Button9.Location.X
+        Fitwidth(3) = Me.Width - Button10.Location.X
+        Fitheight(0) = Me.Height - Button7.Location.Y
+        Fitheight(1) = Me.Height - Button8.Location.Y
+        Fitheight(2) = Me.Height - Button9.Location.Y
+        Fitheight(3) = Me.Height - Button10.Location.Y
+        Hheight = Me.Height
+        Wwidth = Me.Width
+        N = 0
+        ReDim Preserve Proc(N)
+        showOrder = False
+        showPixelOrder = True
+        pictTimer = PictureBox1
+        pictX = 0
+        pictY = 0
+        defCol = Color.FromArgb(255, 0, 0, 0)
+        bOund = defCol
+        initLine(Proc(N).L)
+        initCircle(Proc(N).C)
+        initPixel(Proc(N).P)
+        Proc(N).type = 1
+        RadioButton1.Checked = True
+    End Sub
+
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
+        If GBCount = 0 Then
+            GroupBox2.Show()
+            fillType = 2
+        ElseIf GBCount = 1 Then
+            GroupBox2.Hide()
+        End If
+        GBCount = GBCount + 1
+        If GBCount = 2 Then GBCount = 0
+    End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
+        If GBCount = 0 Then
+            GroupBox3.Show()
+            fillType = 3
+        ElseIf GBCount = 1 Then
+            GroupBox3.Hide()
+        End If
+        GBCount = GBCount + 1
+        If GBCount = 2 Then GBCount = 0
+    End Sub
+
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+        If GBCount = 0 Then
+            GroupBox4.Show()
+        ElseIf GBCount = 1 Then
+            GroupBox4.Hide()
+        End If
+        GBCount = GBCount + 1
+        If GBCount = 2 Then GBCount = 0
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        If Max = 0 Then
+            Button7.Location = New Point(Me.Width / 1 / 2 - Fitwidth(0), Me.Height - Fitheight(0))
+            Button8.Location = New Point(Me.Width / 1 / 2 - Fitwidth(0) + 360, Me.Height - Fitheight(1))
+            Button9.Location = New Point(Me.Width / 1 / 2 - Fitwidth(0) + 720, Me.Height - Fitheight(2))
+            Button10.Location = New Point(Me.Width / 1 / 2 - Fitwidth(0) + 1080, Me.Height - Fitheight(3))
+            Me.WindowState = FormWindowState.Maximized
+        ElseIf Max = 1 Then
+            Me.WindowState = FormWindowState.Normal
+            Button7.Location = New Point(Wwidth - Fitwidth(0), Hheight - Fitheight(0))
+            Button8.Location = New Point(Wwidth - Fitwidth(1), Hheight - Fitheight(1))
+            Button9.Location = New Point(Wwidth - Fitwidth(2), Hheight - Fitheight(2))
+            Button10.Location = New Point(Wwidth - Fitwidth(3), Hheight - Fitheight(3))
+        End If
+        Max = Max + 1
+        If Max = 2 Then Max = 0
+    End Sub
+
+    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub Button2_MouseDown(sender As Object, e As MouseEventArgs) Handles Button2.MouseDown
+
+    End Sub
+
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
+        mLine = True
+        Proc(N).type = 1
+        mFill = False
+        mCircle = False
+    End Sub
+
+    Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
+        mFill = False
+        mLine = False
+        mCircle = True
+        Proc(N).type = 2
+    End Sub
+
+    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
+        Dim colors As DialogResult
+        colors = ColorDialog1.ShowDialog()
+        If colors = Windows.Forms.DialogResult.OK Then
+            Button13.BackColor = ColorDialog1.Color
+            defCol = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).L.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).C.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).P.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+        End If
+    End Sub
+
+    Private Sub PictureBox1_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseUp
+        overFlow = 0
+        down = False
+        N = N + 1
+        ReDim Preserve Proc(N)
+                Proc(N).type = Proc(N - 1).type
+        initLine(Proc(N).L)
+        initCircle(Proc(N).C)
+        initPixel(Proc(N).P)
+    End Sub
+
+    Private Sub SaveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SaveToolStripMenuItem.Click
+        'F.E
+        bmp1.Save("d:\myBitmap.png")
+        'Invariant btn(i,j).backcolor = 0 or 1
+        'Termination
+    End Sub
+
+    Private Sub FileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FileToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub NewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles NewToolStripMenuItem.Click
+        N = 0
+        ReDim Preserve Proc(N)
+        showOrder = False
+        showPixelOrder = True
+        pictTimer = PictureBox1
+        pictX = 0
+        pictY = 0
+        defCol = Color.FromArgb(ColorDialog1.Color.ToArgb)
+        bOund = defCol
+        initLine(Proc(N).L)
+        initCircle(Proc(N).C)
+        initPixel(Proc(N).P)
+        bmp1 = New Bitmap(562, 338, PixelFormat.Format32bppArgb)
+        PictureBox1.Image = bmp1
+    End Sub
+
+    Private Sub OpenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OpenToolStripMenuItem.Click
+        'Init
+        bmp1 =
+            CType(Image.FromFile("d:\myBitmap.png", True), Bitmap)
+        PictureBox1.Image = bmp1
+        'Invariant: btn(i,j).backcolor = gray or red
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+        If CheckBox1.Checked Then
+            showOrder = True
+        Else
+            showOrder = False
+        End If
+    End Sub
+
+    Private Sub Button17_Click(sender As Object, e As EventArgs) 
+        Dim colors As DialogResult
+        colors = ColorDialog1.ShowDialog()
+        If colors = Windows.Forms.DialogResult.OK Then
+            Button13.BackColor = ColorDialog1.Color
+            defCol = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).L.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).C.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).P.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+        End If
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        mFill = True
+        Proc(N).type = 3
+        mLine = False
+        mCircle = False
+    End Sub
+
+    Private Sub GroupBox3_Enter(sender As Object, e As EventArgs) Handles GroupBox3.Enter
+
+    End Sub
+
+    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
+        mFill = False
+        mLine = True
+        Proc(N).type = 1
+        mCircle = False
+    End Sub
+
+    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
+        mFill = False
+        mLine = False
+        mCircle = True
+        Proc(N).type = 2
+    End Sub
+
+    Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
+        Dim colors As DialogResult
+        colors = ColorDialog1.ShowDialog()
+        If colors = Windows.Forms.DialogResult.OK Then
+            Button16.BackColor = ColorDialog1.Color
+            defCol = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).L.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).C.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).P.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+        End If
+    End Sub
+
+    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        mFill = True
+        Proc(N).type = 3
+        mCircle = False
+        mLine = False
+    End Sub
+
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        mFill = True
+        Proc(N).type = 8
+        mLine = False
+        mCircle = False
+    End Sub
+
+    Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
+        mFill = False
+        mLine = False
+        mCircle = True
+        Proc(N).type = 2
+    End Sub
+
+    Private Sub Button17_Click_1(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
+        mLine = True
+        Proc(N).type = 1
+        mFill = False
+        mCircle = False
+    End Sub
+
+    Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
+        mLine = True
+        Proc(N).type = 1
+        mFill = False
+        mCircle = False
+    End Sub
+
+    Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
+        mFill = False
+        mLine = False
+        mCircle = True
+        Proc(N).type = 2
+    End Sub
+
+    Private Sub Button24_Click(sender As Object, e As EventArgs) Handles Button24.Click
+        Dim colors As DialogResult
+        colors = ColorDialog2.ShowDialog()
+        If colors = Windows.Forms.DialogResult.OK Then
+            Button24.BackColor = ColorDialog2.Color
+            bOund = Color.FromArgb(ColorDialog2.Color.ToArgb)
+        End If
+    End Sub
+
+    Private Sub Button18_Click(sender As Object, e As EventArgs) Handles Button18.Click
+        Dim colors As DialogResult
+        colors = ColorDialog1.ShowDialog()
+        If colors = Windows.Forms.DialogResult.OK Then
+            Button13.BackColor = ColorDialog1.Color
+            defCol = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).L.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).C.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).P.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+        End If
+    End Sub
+
+    Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
+        Dim colors As DialogResult
+        colors = ColorDialog1.ShowDialog()
+        If colors = Windows.Forms.DialogResult.OK Then
+            Button13.BackColor = ColorDialog1.Color
+            defCol = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).L.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).C.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+            Proc(N).P.col = Color.FromArgb(ColorDialog1.Color.ToArgb)
+        End If
+    End Sub
+
+    Private Sub Button17_Click_2(sender As Object, e As EventArgs) Handles Button17.Click
+        mFill = True
+        Proc(N).type = 9
+        fillType = 4
+        mCircle = False
+        mLine = False
+    End Sub
+
+    Private Sub CheckBox3_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox3.CheckedChanged
+        If CheckBox3.Checked Then
+            showOrder = True
+        Else
+            showOrder = False
+        End If
+    End Sub
+
+    Private Sub CheckBox4_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox4.CheckedChanged
+        If CheckBox4.Checked Then
+            showOrder = True
+        Else
+            showOrder = False
+        End If
+    End Sub
+
+    Private Sub CheckBox2_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox2.CheckedChanged
+        If CheckBox2.Checked Then
+            showOrder = True
+        Else
+            showOrder = False
+        End If
+    End Sub
+
+    Private Sub PictureBox1_MouseMove(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseMove
+        If down And mLine Then
+            bmp1 = New Bitmap(562, 338, PixelFormat.Format32bppArgb)
+            Proc(N).L.x2 = e.X
+            Proc(N).L.y2 = e.Y
+            overFlow = 0
+            For i = 0 To N
+                Select Case Proc(i).type
+                    Case 1
+                        createStraightLine(Proc(i).L, PictureBox1)
+                    Case 2
+                        createCircle(Proc(i).C, PictureBox1)
+                    Case 3
+                        MsgBox("check")
+                        If Proc(i).P.type = 0 Then
+                            floodfill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 1 Then
+                            floodfillwithstack(Proc(i).P)
+                        ElseIf Proc(i).P.type = 2 Then
+                            scanLineRegionFill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 3 Then
+                            scanLineRegionFillWithStack(Proc(i).P)
+                        ElseIf Proc(i).P.type = 4 Then
+                            boundaryFill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 5 Then
+                            boundaryFillWithStack(Proc(i).P)
+                        ElseIf Proc(i).P.type = 6 Then
+                            scanLineBoundaryFill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 7 Then
+                            scanLineBoundaryFillWithStack(Proc(i).P)
+                        End If
+                End Select
+            Next
+            PictureBox1.Image = bmp1
+        ElseIf down And mCircle Then
+            bmp1 = New Bitmap(562, 338, PixelFormat.Format32bppArgb)
+            Proc(N).C.r = abs(e.X - Proc(N).C.xc)
+            overFlow = 0
+            For i = 0 To N
+                Select Case Proc(i).type
+                    Case 1
+                        createStraightLine(Proc(i).L, PictureBox1)
+                    Case 2
+                        createCircle(Proc(i).C, PictureBox1)
+                    Case 3
+                        MsgBox("check")
+                        If Proc(i).P.type = 0 Then
+                            floodfill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 1 Then
+                            floodfillwithstack(Proc(i).P)
+                        ElseIf Proc(i).P.type = 2 Then
+                            scanLineRegionFill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 3 Then
+                            scanLineRegionFillWithStack(Proc(i).P)
+                        ElseIf Proc(i).P.type = 4 Then
+                            boundaryFill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 5 Then
+                            boundaryFillWithStack(Proc(i).P)
+                        ElseIf Proc(i).P.type = 6 Then
+                            scanLineBoundaryFill(Proc(i).P)
+                        ElseIf Proc(i).P.type = 7 Then
+                            scanLineBoundaryFillWithStack(Proc(i).P)
+                        End If
+                End Select
+            Next
+            PictureBox1.Image = bmp1
+        End If
+    End Sub
+
+    Private Sub PictureBox1_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseDown
+        overFlow = 0
+        If mLine Then
+            Proc(N).L.x1 = e.X
+            Proc(N).L.y1 = e.Y
+            down = True
+        End If
+        If mFill Then
+            MsgBox("check")
+            If showOrder Then
+                Proc(N).P.X = e.X
+                Proc(N).P.Y = e.Y
+                Proc(N).P.col = defCol
+                Proc(N).P.bOund = bOund
+                If fillType = 1 Then
+                    If RadioButton1.Checked Then
+                        Proc(N).P.type = 0
+                    ElseIf RadioButton2.Checked Then
+                        Proc(N).P.type = 1
+                    ElseIf RadioButton3.Checked Then
+                        Proc(N).P.type = 2
+                    ElseIf RadioButton4.Checked Then
+                        Proc(N).P.type = 3
+                    End If
+                ElseIf fillType = 2 Then
+                    If RadioButton5.Checked Then
+                        Proc(N).P.type = 4
+                    ElseIf RadioButton6.Checked Then
+                        Proc(N).P.type = 5
+                    ElseIf RadioButton7.Checked Then
+                        Proc(N).P.type = 6
+                    ElseIf RadioButton8.Checked Then
+                        Proc(N).P.type = 7
+                    End If
+                ElseIf fillType = 3 Then
+                    Proc(N).P.type = 8
+                ElseIf fillType = 4 Then
+                    Proc(N).P.type = 9
+                End If
+                For I = 0 To N
+                    If Proc(I).P.type = 0 Then
+                        SHOWfloodfill(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 1 Then
+                        SHOWfloodfillwithstack(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 2 Then
+                        SHOWscanLineRegionFill(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 3 Then
+                        SHOWscanLineRegionFillWithStack(Proc(I).P, PictureBox1)
+                    ElseIf Proc(I).P.type = 4 Then
+                        SHOWboundaryFill(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.bOund, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 5 Then
+                        SHOWboundaryFillWithStack(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.bOund, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 6 Then
+                        SHOWscanLineBoundaryFill(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.bOund, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 7 Then
+                        SHOWscanLineBoundaryFillWithStack(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.bOund, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 8 Then
+                        SHOWstrippedFill(Proc(I).P.X, Proc(I).P.Y, Proc(I).P.col, PictureBox1)
+                    ElseIf Proc(I).P.type = 9 Then
+                        SHOWcheckeredFill(Proc(I).P.X, Proc(I).P.Y, 5, 5, Proc(I).P.col, PictureBox1)
+                    End If
+                Next
+                PictureBox1.Image = bmp1
+            Else 'not showorder
+                Proc(N).P.X = e.X
+                Proc(N).P.Y = e.Y
+                Proc(N).P.col = defCol
+                Proc(N).P.bOund = bOund
+                If fillType = 1 Then
+                    If RadioButton1.Checked Then
+                        Proc(N).P.type = 0
+                    ElseIf RadioButton2.Checked Then
+                        Proc(N).P.type = 1
+                    ElseIf RadioButton3.Checked Then
+                        Proc(N).P.type = 2
+                    ElseIf RadioButton4.Checked Then
+                        Proc(N).P.type = 3
+                    End If
+                ElseIf filltype = 2 Then
+                    If RadioButton5.Checked Then
+                        Proc(N).P.type = 4
+                    ElseIf RadioButton6.Checked Then
+                        Proc(N).P.type = 5
+                    ElseIf RadioButton7.Checked Then
+                        Proc(N).P.type = 6
+                    ElseIf RadioButton8.Checked Then
+                        Proc(N).P.type = 7
+                    End If
+                ElseIf filltype = 3 Then
+                    Proc(N).P.type = 8
+                ElseIf filltype = 4 Then
+                    Proc(N).P.type = 9
+                End If
+                For I = 0 To N
+                    If Proc(I).P.type = 0 Then
+                        floodfill(Proc(I).P)
+                    ElseIf Proc(I).P.type = 1 Then
+                        floodfillwithstack(Proc(I).P)
+                    ElseIf Proc(I).P.type = 2 Then
+                        scanLineRegionFill(Proc(I).P)
+                    ElseIf Proc(I).P.type = 3 Then
+                        scanLineRegionFillWithStack(Proc(I).P)
+                    ElseIf Proc(I).P.type = 4 Then
+                        boundaryFill(Proc(I).P)
+                    ElseIf Proc(I).P.type = 5 Then
+                        boundaryFillWithStack(Proc(I).P)
+                    ElseIf Proc(I).P.type = 6 Then
+                        scanLineBoundaryFill(Proc(I).P)
+                    ElseIf Proc(I).P.type = 7 Then
+                        scanLineBoundaryFillWithStack(Proc(I).P)
+                    ElseIf Proc(I).P.type = 8 Then
+                        strippedFill(Proc(I).P)
+                    ElseIf Proc(I).P.type = 9 Then
+                        checkeredFill(Proc(I).P, 5, 5)
+                    End If
+                Next
+                PictureBox1.Image = bmp1
+            End If
+        End If
+        If mCircle Then
+            Proc(N).C.xc = e.X
+            Proc(N).C.yc = e.Y
+            down = True
+        End If
+    End Sub
+End Class
